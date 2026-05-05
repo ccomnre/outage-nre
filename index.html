@@ -818,7 +818,7 @@ body.editing .add-card-btn { display: block; }
 </div>
 
 <script>
-const STORAGE_KEY = 'pln_outage_v8';
+const STORAGE_KEY = 'pln_outage_v8c';
 
 const defaultData = {
   lastUpdated: '03-05-2026',
@@ -897,8 +897,8 @@ const defaultData = {
 // ── Shared cloud persistence via JSONBin.io ──────────────────────────────────
 // HARDCODED config (set once by admin, baked into HTML on Netlify)
 // These take priority over localStorage — all devices use same credentials
-const HARDCODED_BIN_ID  = '';   // e.g. '6834ab12ad19877508b5c3f0'
-const HARDCODED_API_KEY = '';   // e.g. '$2a$10$...'
+const HARDCODED_BIN_ID  = '69f84fca856a682189a39fbf';   // baked in
+const HARDCODED_API_KEY = '$2a$10$myBDhg8.aXji5auUWKqkpOzrT5nbFPRvxbnyfyb9oUvBel9MbvECS';   // baked in
 
 function getCloudConfig() {
   // Prefer hardcoded (works for everyone), fallback to localStorage (admin device)
