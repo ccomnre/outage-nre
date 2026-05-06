@@ -157,8 +157,28 @@ header {
   transition: all 0.2s;
   font-family: var(--sans);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
 }
 .pdf-btn:hover { background: var(--surface2); color: var(--text); }
+.wa-btn {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(37,211,102,0.4);
+  background: transparent;
+  color: #25D166;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--sans);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+.wa-btn:hover { background: rgba(37,211,102,0.1); }
+body.light .wa-btn { color: #128C2E; border-color: rgba(18,140,46,0.4); }
+body.light .wa-btn:hover { background: rgba(18,140,46,0.08); }
 /* PDF print styles */
 @media print {
   @page { size: A4 portrait; margin: 14mm 12mm; }
@@ -169,7 +189,7 @@ header {
   /* Header */
   header { position: static !important; background: white !important; border-bottom: 2px solid #ddd !important; backdrop-filter: none !important; padding: 8px 0 !important; margin-bottom: 6px; }
   .header-right { gap: 6px; }
-  .pdf-btn, .theme-btn, .cloud-status-dot, .edit-toggle, .edit-btn, .add-card-btn, .filters, .filter-btn { display: none !important; }
+  .pdf-btn, .wa-btn, .theme-btn, .cloud-status-dot, .edit-toggle, .edit-btn, .add-card-btn, .filters, .filter-btn { display: none !important; }
 
   /* Use light-mode logo for print */
   .logo-pill { background: transparent !important; padding: 0 !important; }
@@ -633,7 +653,12 @@ body.editing .add-card-btn { display: block; }
     <div class="update-tag" id="update-tag">Updated 29-04-2026</div>
     <div class="cloud-status-dot" id="cloud-dot" title="Cloud sync not configured" onclick="if(isAuthenticated||editMode)openCloudSetup()" style="width:8px;height:8px;border-radius:50%;background:var(--text3);cursor:pointer;transition:background 0.3s" title="Cloud sync status"></div>
     <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
-    <button class="pdf-btn" onclick="exportPDF()" title="Export to PDF">⬇ PDF</button>
+    <button class="pdf-btn" onclick="exportPDF()" title="Export to PDF">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>PDF
+    </button>
+    <button class="wa-btn" onclick="shareWhatsApp()" title="Share via WhatsApp">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;margin-right:4px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>WhatsApp
+    </button>
     <button class="edit-toggle" id="edit-toggle" onclick="handleEditClick()">🔐 Login Admin</button>
   </div>
 </header>
@@ -834,44 +859,30 @@ body.editing .add-card-btn { display: block; }
 </div>
 
 <script>
-const STORAGE_KEY = 'pln_outage_v8c';
+const STORAGE_KEY = 'pln_outage_v9';
 
 const DMN_KIT = {"Up Cirata": [{"ul": "PLTA CIRATA #1", "mw": 123.0}, {"ul": "PLTA CIRATA #2", "mw": 123.0}, {"ul": "PLTA CIRATA #3", "mw": 123.0}, {"ul": "PLTA CIRATA #4", "mw": 123.0}, {"ul": "PLTA CIRATA #5", "mw": 123.0}, {"ul": "PLTA CIRATA #6", "mw": 123.0}, {"ul": "PLTA CIRATA #7", "mw": 123.0}, {"ul": "PLTA CIRATA #8", "mw": 123.0}], "Up Brantas": [{"ul": "PLTA SUTAMI #01", "mw": 34.33}, {"ul": "PLTA SUTAMI #02", "mw": 34.33}, {"ul": "PLTA SUTAMI #03", "mw": 34.33}, {"ul": "PLTA WLINGI #01", "mw": 26.81}, {"ul": "PLTA WLINGI #02", "mw": 26.81}, {"ul": "PLTM LODOYO #01", "mw": 4.46}, {"ul": "PLTA SENGGURUH #01", "mw": 14.23}, {"ul": "PLTA SENGGURUH #02", "mw": 14.23}, {"ul": "PLTM SELOREJO #01", "mw": 4.71}, {"ul": "PLTM MENDALAN #01", "mw": 4.2}, {"ul": "PLTM MENDALAN #02", "mw": 5.5}, {"ul": "PLTM MENDALAN #03", "mw": 5.5}, {"ul": "PLTM MENDALAN #04", "mw": 5.5}, {"ul": "PLTM SIMAN #01", "mw": 3.4}, {"ul": "PLTM SIMAN #02", "mw": 3.4}, {"ul": "PLTM SIMAN #03", "mw": 3.4}, {"ul": "PLTA TULUNG AGUNG #01", "mw": 17.86}, {"ul": "PLTA TULUNG AGUNG #02", "mw": 17.86}, {"ul": "PLTMH GIRINGAN #01", "mw": 0.88}, {"ul": "PLTMH GIRINGAN #02", "mw": 0.88}, {"ul": "PLTM GIRINGAN #03", "mw": 1.37}, {"ul": "PLTMH GOLANG #01", "mw": 0.89}, {"ul": "PLTMH GOLANG #02", "mw": 0.89}, {"ul": "PLTMH GOLANG #03", "mw": 0.89}, {"ul": "PLTM NGEBEL #01", "mw": 2.16}, {"ul": "PLTM WONOREJO #01", "mw": 6.5}], "Up Pandan": [{"ul": "PLTA RENUN #01", "mw": 34.91}, {"ul": "PLTA RENUN #02", "mw": 37.91}, {"ul": "PLTA SIPANSIHAPORAS #01", "mw": 33.0}, {"ul": "PLTA SIPANSIHAPORAS #02", "mw": 17.0}, {"ul": "PLTMH AEK RAISAN I", "mw": 0.65}, {"ul": "PLTMH AEK RAISAN II", "mw": 0.65}, {"ul": "PLTMH AEK SIBUNDONG #01", "mw": 0.68}, {"ul": "PLTMH AEK SILANG #01", "mw": 0.7}, {"ul": "PLTMH BATANG GADIS #01", "mw": 0.38}, {"ul": "PLTMH BATANG GADIS #02", "mw": 0.38}, {"ul": "PLTMH BOHO #01", "mw": 0.19}, {"ul": "PLTMH KOMBIH I #01", "mw": 0.7}, {"ul": "PLTMH KOMBIH I #02", "mw": 0.7}, {"ul": "PLTMH KOMBIH II #01", "mw": 0.7}, {"ul": "PLTMH KOMBIH II #02", "mw": 0.68}, {"ul": "PLTMH TONDUHAN #01", "mw": 0.19}, {"ul": "PLTMH TONDUHAN #02", "mw": 0.19}], "Up Bandar Lampung": [{"ul": "PLTA BATUTEGI #01", "mw": 14.0}, {"ul": "PLTA BATUTEGI #02", "mw": 14.0}, {"ul": "PLTA BESAI #01", "mw": 44.81}, {"ul": "PLTA BESAI #02", "mw": 44.81}, {"ul": "PLTD TARAHAN #04 (SWD)", "mw": 2.7}, {"ul": "PLTD TARAHAN #05 (SWD)", "mw": 2.7}, {"ul": "PLTD TARAHAN #06 (SWD)", "mw": 2.76}, {"ul": "PLTD TEGINENENG #01 (WARTSILA)", "mw": 4.68}, {"ul": "PLTD TEGINENENG #02 (WARTSILA)", "mw": 4.68}, {"ul": "PLTD TEGINENENG #03 (WARTSILA)", "mw": 5.18}, {"ul": "PLTD TELUK BETUNG #07 (SWD)", "mw": 2.31}, {"ul": "PLTD TELUK BETUNG #08 (SWD)", "mw": 2.31}, {"ul": "PLTD TELUK BETUNG #10 (SULZER)", "mw": 2.31}, {"ul": "PLTG TARAHAN #01", "mw": 14.81}], "Up Bakaru": [{"ul": "PLTA BAKARU #01", "mw": 63.0}, {"ul": "PLTA BAKARU #02", "mw": 63.0}, {"ul": "PLTA BILI-BILI #02", "mw": 13.685}, {"ul": "PLTM BONEHAU #01", "mw": 0.0}, {"ul": "PLTM BONEHAU #02", "mw": 0.0}, {"ul": "PLTM BUDONG-BUDONG #01", "mw": 0.0}, {"ul": "PLTM BUDONG-BUDONG #02", "mw": 0.0}, {"ul": "PLTMH BALLA #01", "mw": 0.35}, {"ul": "PLTMH BALLA #02", "mw": 0.35}, {"ul": "PLTM BILI-BILI #01", "mw": 5.78}, {"ul": "PLTMH SAWITTO #01", "mw": 0.46}, {"ul": "PLTMH SAWITTO #02", "mw": 0.437}, {"ul": "PLTMH SAWITTO #03", "mw": 0.43}, {"ul": "PLTMH KALUKKU #01", "mw": 0.0}, {"ul": "PLTMH KALUKKU #02", "mw": 0.0}, {"ul": "PLTD SUPPA #01", "mw": 10.3667}, {"ul": "PLTD SUPPA #02", "mw": 10.3667}, {"ul": "PLTD SUPPA #03", "mw": 10.3667}, {"ul": "PLTD SUPPA #04", "mw": 10.3667}, {"ul": "PLTD SUPPA #05", "mw": 10.3667}, {"ul": "PLTD SUPPA #06", "mw": 10.3667}], "Up Minahasa": [{"ul": "PLTM TANGGARI I #01 (NEYRPIC)", "mw": 9.0}, {"ul": "PLTM TANGGARI I #02 (NEYRPIC)", "mw": 9.0}, {"ul": "PLTM TANGGARI II #01 (BOUVIER HYDRO)", "mw": 9.5}, {"ul": "PLTM TANGGARI II #02 (BOUVIER HYDRO)", "mw": 9.5}, {"ul": "PLTM TONSEALAMA #01 (ESCHER WYSS)", "mw": 3.0}, {"ul": "PLTM TONSEALAMA #02 (STORK HOLLAND)", "mw": 4.0}, {"ul": "PLTM TONSEALAMA #03 (ANDRITZ E W)", "mw": 5.0}, {"ul": "PLTD BITUNG #01 (SWD)", "mw": 2.0}, {"ul": "PLTD BITUNG #02 (SWD)", "mw": 2.0}, {"ul": "PLTD BITUNG #05 (SEMT PIELSTICK)", "mw": 2.0}, {"ul": "PLTD BITUNG #06 (SEMT PIELSTICK)", "mw": 3.0}, {"ul": "PLTD LOPANA #01 (NIIGATA)", "mw": 4.5}, {"ul": "PLTD LOPANA #02 (NIIGATA)", "mw": 4.5}, {"ul": "PLTD KOTAMOBAGU #01 (DAIHATSU)", "mw": 0.3}, {"ul": "PLTD KOTAMOBAGU #02 (DAIHATSU)", "mw": 0.35}, {"ul": "PLTD KOTAMOBAGU #03 (SWD)", "mw": 0.65}, {"ul": "PLTD KOTAMOBAGU #05 (MAK)", "mw": 2.0}, {"ul": "PLTD KOTAMOBAGU #06 (MAK)", "mw": 1.9}, {"ul": "PLTD TAHUNA #01 (SWD)", "mw": 0.425}, {"ul": "PLTD TAHUNA #04 (DEUTZ)", "mw": 0.15}, {"ul": "PLTD TAHUNA #05 (DEUTZ)", "mw": 0.3}, {"ul": "PLTD TAHUNA #06 (MITSUBISHI)", "mw": 0.85}, {"ul": "PLTD TAHUNA #07 (MITSUBISHI)", "mw": 1.0}, {"ul": "PLTD TAHUNA #08 (CUMMINS) EX PLTD WUA-WUA #10", "mw": 0.85}, {"ul": "PLTD TAHUNA #09 (CUMMINS) EX PLTD WUA-WUA #15", "mw": 0.85}, {"ul": "PLTG HALMAHERA TIMUR #01 EX PLTG BATANG HARI #01", "mw": 29.87}, {"ul": "PLTG HALMAHERA TIMUR #02 EX PLTG BATANG HARI #02", "mw": 29.87}, {"ul": "PLTG HALMAHERA TIMUR #03 EX PLTG JAKA BARING #01", "mw": 16.0}, {"ul": "PLTG HALMAHERA TIMUR #04 EX PLTG JAKA BARING #02", "mw": 17.5}, {"ul": "PLTG HALMAHERA TIMUR #05 EX PLTG JAKA BARING #03", "mw": 17.0}, {"ul": "PLTG HALMAHERA TIMUR #06 PLTG MALEO #03", "mw": 23.5}]};
 
 const defaultData = {
-  lastUpdated: '03-05-2026',
+  lastUpdated: '04-05-2026',
   active: [
-    {
-      id:1, updk:'UP Brantas', name:'PLTM MENDALAN #01', mw:4.2, scope:'GI',
-      start:'20 Apr 2026', end:'26 Apr 2026', dur:7,
-      rencana:95, realisasi:100,
-      note:'Declare Sabtu 25 April 2026 21:45',
-      keepActive:true
-    },
     {
       id:2, updk:'UP Brantas', name:'PLTM MENDALAN #04', mw:5.5, scope:'GI+',
       start:'27 Apr 2026', end:'26 May 2026', dur:30,
-      rencana:15.39, realisasi:21.04,
-      note:'Proses penggantian wedges stator generator, proses penggantian seal Main Inlet Valve'
-    },
-    {
-      id:3, updk:'UP Minahasa', name:'PLTD Tahuna #09 (CUMMINS) EX PLTD WUA-WUA #15', mw:0.85, scope:'Final Stage',
-      start:'2 Apr 2026', end:'4 May 2026', dur:29,
-      rencana:100, realisasi:100,
-      note:'Proses Test Run',
-      keepActive:true
+      rencana:19.81, realisasi:25.7,
+      note:'Penggantian seal Main Inlet Valve'
     },
     {
       id:4, updk:'UP Pandan', name:'PLTA SIPANSIHAPORAS #01', mw:33, scope:'FO-OMC',
       start:'26 Dec 2025', end:'5 Jun 2026', dur:162,
-      rencana:80.96, realisasi:85.77,
-      note:'Pembersihan damsite, headrace tunnel dan penstock dari sedimen. Progress pengerukan sedimen damsite 53.13% (leading 0.12%).'
+      rencana:81.66, realisasi:86.57,
+      note:'Pembersihan damsite, headrace tunnel dan penstock dari sedimen. Progress pengerukan sedimen damsite 56.88% (leading 0.22%).'
     },
     {
       id:5, updk:'UP Pandan', name:'PLTA SIPANSIHAPORAS #02', mw:17, scope:'FO-OMC',
       start:'26 Dec 2025', end:'5 Jun 2026', dur:162,
-      rencana:74.83, realisasi:92.51,
-      note:'Proses flushing settiling basin (90%), flushing tunnel (90%) penormalan warning system (81%). Proses retrofit sistem AVR, progress 73% (menunggu komisioning). Untuk proses pekerjaan retrofit AVR di pending dulu, karena saat ini masuk timeline pengujian dengan operasi unit, namun masih menunggu pekerjaan pengerukan sedimen settling basin. Proses retrofit sistem relay proteksi generator dan trafo (98%)'
+      rencana:75.51, realisasi:93.01,
+      note:'Proses flushing settiling basin (100%), flushing tunnel (100%) penormalan warning system (90%). Proses retrofit sistem AVR, progress 73% (menunggu komisioning). Untuk proses pekerjaan retrofit AVR di pending dulu, karena saat ini masuk timeline pengujian dengan operasi unit, namun masih menunggu pekerjaan pengerukan sedimen settling basin. Proses retrofit sistem relay proteksi generator dan trafo (98%) Hari ini 5 Mei rencana persiapan komisioning'
     }
   ],
   done: [
@@ -898,6 +909,12 @@ const defaultData = {
       start:'20 Apr 2026', end:'25 Apr 2026', dur:7, manualActualDur:6,
       rencana:95, realisasi:100,
       note:'Declare Sabtu 25 April 2026 21:45'
+    },
+    {
+      id:105, updk:'UP Minahasa', name:'PLTD Tahuna #09 (CUMMINS) EX PLTD WUA-WUA #15', mw:0.85, scope:'Final Stage',
+      start:'2 Apr 2026', end:'4 May 2026', dur:29, manualActualDur:33,
+      rencana:100, realisasi:100,
+      note:'Declare 4 Mei 2026'
     }
   ],
   upcoming: [
@@ -915,8 +932,8 @@ const defaultData = {
 // ── Shared cloud persistence via JSONBin.io ──────────────────────────────────
 // HARDCODED config (set once by admin, baked into HTML on Netlify)
 // These take priority over localStorage — all devices use same credentials
-const HARDCODED_BIN_ID  = '69f84fca856a682189a39fbf';   // baked in
-const HARDCODED_API_KEY = '$2a$10$myBDhg8.aXji5auUWKqkpOzrT5nbFPRvxbnyfyb9oUvBel9MbvECS';   // baked in
+const HARDCODED_BIN_ID  = '';   // e.g. '6834ab12ad19877508b5c3f0'
+const HARDCODED_API_KEY = '';   // e.g. '$2a$10$...'
 
 function getCloudConfig() {
   // Prefer hardcoded (works for everyone), fallback to localStorage (admin device)
@@ -1018,7 +1035,7 @@ function bakeAndDownload() {
         `const HARDCODED_API_KEY = '${apiKey}';   // baked in`
       );
       // Also bump storage key so all devices get fresh cloud data on load
-      src = src.replace("const STORAGE_KEY = 'pln_outage_v8';", "const STORAGE_KEY = 'pln_outage_v8c';");
+      src = src.replace("const STORAGE_KEY = 'pln_outage_v9';", "const STORAGE_KEY = 'pln_outage_v8c';");
       const blob = new Blob([src], { type: 'text/html' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -1396,6 +1413,21 @@ function exitEditMode() {
   const btn = document.getElementById('edit-toggle');
   btn.classList.remove('active');
   btn.textContent = '🔐 Login Admin';
+}
+
+function shareWhatsApp() {
+  // Build Indonesian date string from updated date (today - 1)
+  var d = new Date();
+  d.setDate(d.getDate() - 1);
+  var hariArr = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  var bulanArr = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  var hari   = hariArr[d.getDay()];
+  var tgl    = d.getDate();
+  var bulan  = bulanArr[d.getMonth()];
+  var tahun  = d.getFullYear();
+  var caption = 'Berikut Update Monitoring Outage Hari ' + hari + ', ' + tgl + ' ' + bulan + ' ' + tahun;
+  var url = 'https://wa.me/?text=' + encodeURIComponent(caption);
+  window.open(url, '_blank');
 }
 
 function exportPDF() {
