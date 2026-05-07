@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PLN NP — Outage Update Form</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060d1a;
+  --card: #0d1b2e;
+  --card2: #112240;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e2eaf4;
+  --text2: #6b85a0;
+  --text3: #3a4f65;
+  --accent: #1d6feb;
+  --accent2: #2d84ff;
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Plus Jakarta Sans', sans-serif;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
+
+/* Background decoration */
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; left: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(29,111,235,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* HEADER */
+.header {
+  background: rgba(6,13,26,0.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 12px;
+}
+.header-logo {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  color: #fff; letter-spacing: -0.5px; flex-shrink: 0;
+}
+.header-text { flex: 1; }
+.header-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.2; }
+.header-sub { font-size: 11px; color: var(--text2); font-weight: 300; }
+.header-link {
+  font-size: 11px; color: var(--accent2);
+  text-decoration: none; font-family: var(--mono);
+  background: rgba(29,111,235,0.1);
+  border: 1px solid rgba(29,111,235,0.2);
+  padding: 4px 10px; border-radius: 6px;
+  white-space: nowrap;
+}
+.header-link:hover { background: rgba(29,111,235,0.18); }
+
+/* MAIN */
+.main { max-width: 520px; margin: 0 auto; padding: 24px 16px; position: relative; z-index: 1; }
+
+/* ACTION TABS */
+.action-tabs { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 24px; }
+.action-tab {
+  padding: 10px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border2);
+  background: var(--card);
+  color: var(--text2);
+  font-size: 11px; font-weight: 500;
+  text-align: center; cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.3;
+  font-family: var(--sans);
+}
+.action-tab .tab-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+.action-tab:hover { border-color: var(--accent); color: var(--text); }
+.action-tab.active {
+  background: rgba(29,111,235,0.15);
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+/* CARD */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+.form-card-title {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text3); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.form-card-title::before {
+  content: ''; display: inline-block;
+  width: 3px; height: 12px;
+  background: var(--accent); border-radius: 2px;
+}
+
+/* FIELD */
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--text2); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 6px;
+}
+.field label .req { color: var(--red); margin-left: 2px; }
+.field label .hint { color: var(--text3); font-size: 10px; font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 4px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 11px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text); font-family: var(--sans); font-size: 14px;
+  outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none; appearance: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(29,111,235,0.15);
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236b85a0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  background-color: var(--bg); padding-right: 32px; cursor: pointer;
+}
+.field select option { background: #0d1b2e; }
+.field textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+.field .auto-badge {
+  display: inline-block; margin-top: 6px;
+  font-size: 10px; font-family: var(--mono);
+  color: var(--green); background: var(--green-dim);
+  border-radius: 4px; padding: 2px 7px;
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* DMN display */
+.dmn-display {
+  padding: 11px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono); font-size: 16px; font-weight: 500;
+  color: var(--accent2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dmn-display .dmn-unit { font-size: 11px; color: var(--text3); font-weight: 400; }
+
+/* PROGRESS slider */
+.slider-wrap { position: relative; }
+.slider-wrap input[type=range] {
+  width: 100%; height: 6px;
+  background: var(--border2); border-radius: 3px;
+  padding: 0; cursor: pointer; accent-color: var(--accent2);
+  border: none; box-shadow: none;
+}
+.slider-val {
+  position: absolute; right: 0; top: -22px;
+  font-family: var(--mono); font-size: 13px; font-weight: 500;
+  color: var(--accent2);
+}
+.slider-labels { display: flex; justify-content: space-between; margin-top: 4px; }
+.slider-labels span { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+
+/* OPTIONAL section toggle */
+.optional-toggle {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text2); cursor: pointer;
+  margin-bottom: 14px; user-select: none;
+}
+.optional-toggle svg { transition: transform 0.2s; }
+.optional-toggle.open svg { transform: rotate(90deg); }
+
+/* SUBMIT */
+.submit-btn {
+  width: 100%; padding: 16px;
+  background: var(--accent);
+  border: none; border-radius: var(--radius);
+  color: #fff; font-family: var(--sans);
+  font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 16px rgba(29,111,235,0.35);
+}
+.submit-btn:hover { background: var(--accent2); box-shadow: 0 6px 24px rgba(29,111,235,0.5); }
+.submit-btn:active { transform: scale(0.98); }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* STATUS */
+.status-card {
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: none; margin-bottom: 16px;
+  font-size: 14px; font-weight: 500;
+  align-items: center; gap: 12px;
+}
+.status-card.success { background: var(--green-dim); border: 1px solid rgba(34,197,94,0.3); color: var(--green); display: flex; }
+.status-card.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--red); display: flex; }
+.status-card.loading { background: rgba(29,111,235,0.1); border: 1px solid rgba(29,111,235,0.2); color: var(--accent2); display: flex; }
+
+/* Section selector */
+.section-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.section-chip {
+  padding: 6px 14px; border-radius: 99px;
+  border: 1px solid var(--border2);
+  background: transparent; color: var(--text2);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  font-family: var(--sans); transition: all 0.15s;
+}
+.section-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Progress delta indicator */
+.delta-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+.delta-pill {
+  font-size: 11px; font-family: var(--mono);
+  padding: 3px 8px; border-radius: 99px;
+}
+.delta-pill.positive { background: var(--green-dim); color: var(--green); }
+.delta-pill.negative { background: rgba(239,68,68,0.12); color: var(--red); }
+.delta-pill.zero { background: var(--border); color: var(--text3); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">PLN</div>
+  <div class="header-text">
+    <div class="header-title">Outage Update Form</div>
+    <div class="header-sub">PLN Nusantara Power — DIV NRE</div>
+  </div>
+  <a class="header-link" href="https://ccomnre.github.io/outage-nre/" target="_blank">↗ Dashboard</a>
+</div>
+
+<div class="main">
+
+  <!-- STATUS -->
+  <div class="status-card" id="status-card">
+    <span id="status-icon">⏳</span>
+    <span id="status-msg">Submitting...</span>
+  </div>
+
+  <!-- ACTION TABS -->
+  <div class="action-tabs">
+    <button class="action-tab active" onclick="setAction('update',this)">
+      <span class="tab-icon">✏️</span>Update Progress
+    </button>
+    <button class="action-tab" onclick="setAction('add',this)">
+      <span class="tab-icon">➕</span>Add New Outage
+    </button>
+    <button class="action-tab" onclick="setAction('complete',this)">
+      <span class="tab-icon">✅</span>Mark Completed
+    </button>
+  </div>
+
+  <!-- UNIT SELECTION -->
+  <div class="form-card">
+    <div class="form-card-title">Unit</div>
+
+    <!-- UPDATE / COMPLETE: shows only active outages from dashboard -->
+    <div id="unit-update">
+      <div class="field">
+        <label>UP/UPDK <span class="req">*</span></label>
+        <select id="f-updk-update" onchange="onUpdkChangeUpdate(this.value)">
+          <option value="">— Loading... —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>UP/UL (Unit Name) <span class="req">*</span></label>
+        <select id="f-ul-update" onchange="onUlChangeUpdate(this.value)">
+          <option value="">— Select UP/UPDK first —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ADD NEW: shows all 117 units from DMN KIT -->
+    <div id="unit-add" style="display:none">
+      <div class="field">
+        <label>UP/UPDK <span class="req">*</span></label>
+        <select id="f-updk" onchange="onUpdkChange(this.value)">
+          <option value="">— Select UP/UPDK —</option>
+          <option>Up Cirata</option>
+          <option>Up Brantas</option>
+          <option>Up Pandan</option>
+          <option>Up Bandar Lampung</option>
+          <option>Up Bakaru</option>
+          <option>Up Minahasa</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>UP/UL (Unit Name) <span class="req">*</span></label>
+        <select id="f-ul" onchange="onUlChange(this.value)">
+          <option value="">— Select UP/UPDK first —</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Shared: DMN display + current values -->
+    <div class="field">
+      <label>DMN (MW) <span class="hint">auto-filled</span></label>
+      <div class="dmn-display" id="dmn-display">
+        <span id="dmn-val">—</span>
+        <span class="dmn-unit">MW</span>
+      </div>
+      <span class="auto-badge" id="dmn-badge" style="display:none">✓ Auto-filled from DMN KIT</span>
+    </div>
+    <div id="current-info" style="display:none;margin-top:8px;padding:8px 12px;background:var(--card2);border-radius:var(--radius-sm);border:1px solid var(--border2)"></div>
+  </div>
+
+  <!-- PROGRESS (update & add) -->
+  <div class="form-card" id="card-progress">
+    <div class="form-card-title">Progress</div>
+
+    <div class="field">
+      <label>Rencana (%)</label>
+      <div class="slider-wrap">
+        <span class="slider-val" id="rencana-val">0%</span>
+        <input type="range" id="f-rencana" min="0" max="100" step="0.01" value="0"
+          oninput="updateSlider('rencana')">
+      </div>
+      <div class="slider-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+      <input type="number" id="f-rencana-num" min="0" max="100" step="0.01" placeholder="Or type exact value"
+        style="margin-top:8px" oninput="syncSlider('rencana')">
+    </div>
+
+    <div class="field" style="margin-top:20px">
+      <label>Realisasi (%)</label>
+      <div class="slider-wrap">
+        <span class="slider-val" id="realisasi-val">0%</span>
+        <input type="range" id="f-realisasi" min="0" max="100" step="0.01" value="0"
+          oninput="updateSlider('realisasi')">
+      </div>
+      <div class="slider-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+      <input type="number" id="f-realisasi-num" min="0" max="100" step="0.01" placeholder="Or type exact value"
+        style="margin-top:8px" oninput="syncSlider('realisasi')">
+      <div class="delta-row" id="delta-row" style="display:none">
+        <span style="font-size:11px;color:var(--text2)">Deviation:</span>
+        <span class="delta-pill" id="delta-pill">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="form-card">
+    <div class="form-card-title">Keterangan</div>
+    <div class="field">
+      <label>Progress Notes</label>
+      <textarea id="f-note" placeholder="Tuliskan update progress, kendala, atau catatan terbaru..."></textarea>
+    </div>
+  </div>
+
+  <!-- ADD NEW fields (hidden by default) -->
+  <div class="form-card" id="card-add" style="display:none">
+    <div class="form-card-title">New Outage Details</div>
+    <div class="field">
+      <label>Section <span class="req">*</span></label>
+      <div class="section-chips">
+        <button class="section-chip active" onclick="setSection('active',this)">Active</button>
+        <button class="section-chip" onclick="setSection('upcoming',this)">Upcoming</button>
+      </div>
+      <input type="hidden" id="f-section" value="active">
+    </div>
+    <div class="field">
+      <label>Scope Outage</label>
+      <input type="text" id="f-scope" placeholder="e.g. GI, MOH, FO-OMC, MI, TO, AI">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Start Date</label>
+        <input type="text" id="f-start" placeholder="e.g. 26 Dec 2025">
+      </div>
+      <div class="field">
+        <label>End Date (Plan)</label>
+        <input type="text" id="f-end" placeholder="e.g. 5 Jun 2026">
+      </div>
+    </div>
+    <div class="field">
+      <label>Duration (days)</label>
+      <input type="number" id="f-dur" placeholder="e.g. 162" min="1">
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <button class="submit-btn" id="submit-btn" onclick="submitForm()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    Submit Update
+  </button>
+
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+var BIN_ID  = '69f84fca856a682189a39fbf';
+var API_KEY = '$2a$10$myBDhg8.aXji5auUWKqkpOzrT5nbFPRvxbnyfyb9oUvBel9MbvECS';
+var BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+
+// ── DMN KIT (used only for Add New Outage tab) ────────────────────────────────
+var DMN_KIT = {"Up Cirata": [{"ul": "PLTA CIRATA #1", "mw": 123.0}, {"ul": "PLTA CIRATA #2", "mw": 123.0}, {"ul": "PLTA CIRATA #3", "mw": 123.0}, {"ul": "PLTA CIRATA #4", "mw": 123.0}, {"ul": "PLTA CIRATA #5", "mw": 123.0}, {"ul": "PLTA CIRATA #6", "mw": 123.0}, {"ul": "PLTA CIRATA #7", "mw": 123.0}, {"ul": "PLTA CIRATA #8", "mw": 123.0}], "Up Brantas": [{"ul": "PLTA SUTAMI #01", "mw": 34.33}, {"ul": "PLTA SUTAMI #02", "mw": 34.33}, {"ul": "PLTA SUTAMI #03", "mw": 34.33}, {"ul": "PLTA WLINGI #01", "mw": 26.81}, {"ul": "PLTA WLINGI #02", "mw": 26.81}, {"ul": "PLTM LODOYO #01", "mw": 4.46}, {"ul": "PLTA SENGGURUH #01", "mw": 14.23}, {"ul": "PLTA SENGGURUH #02", "mw": 14.23}, {"ul": "PLTM SELOREJO #01", "mw": 4.71}, {"ul": "PLTM MENDALAN #01", "mw": 4.2}, {"ul": "PLTM MENDALAN #02", "mw": 5.5}, {"ul": "PLTM MENDALAN #03", "mw": 5.5}, {"ul": "PLTM MENDALAN #04", "mw": 5.5}, {"ul": "PLTM SIMAN #01", "mw": 3.4}, {"ul": "PLTM SIMAN #02", "mw": 3.4}, {"ul": "PLTM SIMAN #03", "mw": 3.4}, {"ul": "PLTA TULUNG AGUNG #01", "mw": 17.86}, {"ul": "PLTA TULUNG AGUNG #02", "mw": 17.86}, {"ul": "PLTMH GIRINGAN #01", "mw": 0.88}, {"ul": "PLTMH GIRINGAN #02", "mw": 0.88}, {"ul": "PLTM GIRINGAN #03", "mw": 1.37}, {"ul": "PLTMH GOLANG #01", "mw": 0.89}, {"ul": "PLTMH GOLANG #02", "mw": 0.89}, {"ul": "PLTMH GOLANG #03", "mw": 0.89}, {"ul": "PLTM NGEBEL #01", "mw": 2.16}, {"ul": "PLTM WONOREJO #01", "mw": 6.5}], "Up Pandan": [{"ul": "PLTA RENUN #01", "mw": 34.91}, {"ul": "PLTA RENUN #02", "mw": 37.91}, {"ul": "PLTA SIPANSIHAPORAS #01", "mw": 33.0}, {"ul": "PLTA SIPANSIHAPORAS #02", "mw": 17.0}, {"ul": "PLTMH AEK RAISAN I", "mw": 0.65}, {"ul": "PLTMH AEK RAISAN II", "mw": 0.65}, {"ul": "PLTMH AEK SIBUNDONG #01", "mw": 0.68}, {"ul": "PLTMH AEK SILANG #01", "mw": 0.7}, {"ul": "PLTMH BATANG GADIS #01", "mw": 0.38}, {"ul": "PLTMH BATANG GADIS #02", "mw": 0.38}, {"ul": "PLTMH BOHO #01", "mw": 0.19}, {"ul": "PLTMH KOMBIH I #01", "mw": 0.7}, {"ul": "PLTMH KOMBIH I #02", "mw": 0.7}, {"ul": "PLTMH KOMBIH II #01", "mw": 0.7}, {"ul": "PLTMH KOMBIH II #02", "mw": 0.68}, {"ul": "PLTMH TONDUHAN #01", "mw": 0.19}, {"ul": "PLTMH TONDUHAN #02", "mw": 0.19}], "Up Bandar Lampung": [{"ul": "PLTA BATUTEGI #01", "mw": 14.0}, {"ul": "PLTA BATUTEGI #02", "mw": 14.0}, {"ul": "PLTA BESAI #01", "mw": 44.81}, {"ul": "PLTA BESAI #02", "mw": 44.81}, {"ul": "PLTD TARAHAN #04 (SWD)", "mw": 2.7}, {"ul": "PLTD TARAHAN #05 (SWD)", "mw": 2.7}, {"ul": "PLTD TARAHAN #06 (SWD)", "mw": 2.76}, {"ul": "PLTD TEGINENENG #01 (WARTSILA)", "mw": 4.68}, {"ul": "PLTD TEGINENENG #02 (WARTSILA)", "mw": 4.68}, {"ul": "PLTD TEGINENENG #03 (WARTSILA)", "mw": 5.18}, {"ul": "PLTD TELUK BETUNG #07 (SWD)", "mw": 2.31}, {"ul": "PLTD TELUK BETUNG #08 (SWD)", "mw": 2.31}, {"ul": "PLTD TELUK BETUNG #10 (SULZER)", "mw": 2.31}, {"ul": "PLTG TARAHAN #01", "mw": 14.81}], "Up Bakaru": [{"ul": "PLTA BAKARU #01", "mw": 63.0}, {"ul": "PLTA BAKARU #02", "mw": 63.0}, {"ul": "PLTA BILI-BILI #02", "mw": 13.685}, {"ul": "PLTM BONEHAU #01", "mw": 0.0}, {"ul": "PLTM BONEHAU #02", "mw": 0.0}, {"ul": "PLTM BUDONG-BUDONG #01", "mw": 0.0}, {"ul": "PLTM BUDONG-BUDONG #02", "mw": 0.0}, {"ul": "PLTMH BALLA #01", "mw": 0.35}, {"ul": "PLTMH BALLA #02", "mw": 0.35}, {"ul": "PLTM BILI-BILI #01", "mw": 5.78}, {"ul": "PLTMH SAWITTO #01", "mw": 0.46}, {"ul": "PLTMH SAWITTO #02", "mw": 0.437}, {"ul": "PLTMH SAWITTO #03", "mw": 0.43}, {"ul": "PLTMH KALUKKU #01", "mw": 0.0}, {"ul": "PLTMH KALUKKU #02", "mw": 0.0}, {"ul": "PLTD SUPPA #01", "mw": 10.3667}, {"ul": "PLTD SUPPA #02", "mw": 10.3667}, {"ul": "PLTD SUPPA #03", "mw": 10.3667}, {"ul": "PLTD SUPPA #04", "mw": 10.3667}, {"ul": "PLTD SUPPA #05", "mw": 10.3667}, {"ul": "PLTD SUPPA #06", "mw": 10.3667}], "Up Minahasa": [{"ul": "PLTM TANGGARI I #01 (NEYRPIC)", "mw": 9.0}, {"ul": "PLTM TANGGARI I #02 (NEYRPIC)", "mw": 9.0}, {"ul": "PLTM TANGGARI II #01 (BOUVIER HYDRO)", "mw": 9.5}, {"ul": "PLTM TANGGARI II #02 (BOUVIER HYDRO)", "mw": 9.5}, {"ul": "PLTM TONSEALAMA #01 (ESCHER WYSS)", "mw": 3.0}, {"ul": "PLTM TONSEALAMA #02 (STORK HOLLAND)", "mw": 4.0}, {"ul": "PLTM TONSEALAMA #03 (ANDRITZ E W)", "mw": 5.0}, {"ul": "PLTD BITUNG #01 (SWD)", "mw": 2.0}, {"ul": "PLTD BITUNG #02 (SWD)", "mw": 2.0}, {"ul": "PLTD BITUNG #05 (SEMT PIELSTICK)", "mw": 2.0}, {"ul": "PLTD BITUNG #06 (SEMT PIELSTICK)", "mw": 3.0}, {"ul": "PLTD LOPANA #01 (NIIGATA)", "mw": 4.5}, {"ul": "PLTD LOPANA #02 (NIIGATA)", "mw": 4.5}, {"ul": "PLTD KOTAMOBAGU #01 (DAIHATSU)", "mw": 0.3}, {"ul": "PLTD KOTAMOBAGU #02 (DAIHATSU)", "mw": 0.35}, {"ul": "PLTD KOTAMOBAGU #03 (SWD)", "mw": 0.65}, {"ul": "PLTD KOTAMOBAGU #05 (MAK)", "mw": 2.0}, {"ul": "PLTD KOTAMOBAGU #06 (MAK)", "mw": 1.9}, {"ul": "PLTD TAHUNA #01 (SWD)", "mw": 0.425}, {"ul": "PLTD TAHUNA #04 (DEUTZ)", "mw": 0.15}, {"ul": "PLTD TAHUNA #05 (DEUTZ)", "mw": 0.3}, {"ul": "PLTD TAHUNA #06 (MITSUBISHI)", "mw": 0.85}, {"ul": "PLTD TAHUNA #07 (MITSUBISHI)", "mw": 1.0}, {"ul": "PLTD TAHUNA #08 (CUMMINS) EX PLTD WUA-WUA #10", "mw": 0.85}, {"ul": "PLTD TAHUNA #09 (CUMMINS) EX PLTD WUA-WUA #15", "mw": 0.85}, {"ul": "PLTG HALMAHERA TIMUR #01 EX PLTG BATANG HARI #01", "mw": 29.87}, {"ul": "PLTG HALMAHERA TIMUR #02 EX PLTG BATANG HARI #02", "mw": 29.87}, {"ul": "PLTG HALMAHERA TIMUR #03 EX PLTG JAKA BARING #01", "mw": 16.0}, {"ul": "PLTG HALMAHERA TIMUR #04 EX PLTG JAKA BARING #02", "mw": 17.5}, {"ul": "PLTG HALMAHERA TIMUR #05 EX PLTG JAKA BARING #03", "mw": 17.0}, {"ul": "PLTG HALMAHERA TIMUR #06 PLTG MALEO #03", "mw": 23.5}]};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+var currentAction  = 'update';
+var currentSection = 'active';
+var selectedMW     = 0;
+var activeOutages  = [];   // loaded from JSONBin on page load
+var binData        = null; // full bin data cached
+
+// ── Load active outages from JSONBin on page load ─────────────────────────────
+async function loadActiveOutages() {
+  showStatus('loading', 'Memuat data outage aktif...');
+  try {
+    var res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': API_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    binData = await res.json();
+    activeOutages = binData.active || [];
+    hideStatus();
+    populateUpdateDropdowns();
+  } catch(err) {
+    showStatus('error', 'Gagal memuat data. Cek koneksi internet dan coba refresh halaman.');
+  }
+}
+
+// ── Populate Update Progress dropdowns from live active outages ───────────────
+function populateUpdateDropdowns() {
+  // Get unique UPDKs from active outages
+  var updks = [];
+  activeOutages.forEach(function(item) {
+    if (updks.indexOf(item.updk) === -1) updks.push(item.updk);
+  });
+  var updkSel = document.getElementById('f-updk-update');
+  updkSel.innerHTML = '<option value="">— Select UP/UPDK —</option>';
+  updks.forEach(function(updk) {
+    var opt = document.createElement('option');
+    opt.value = updk; opt.textContent = updk;
+    updkSel.appendChild(opt);
+  });
+}
+
+function onUpdkChangeUpdate(updk) {
+  var ulSel = document.getElementById('f-ul-update');
+  ulSel.innerHTML = '<option value="">— Select UP/UL —</option>';
+  document.getElementById('dmn-val').textContent = '—';
+  document.getElementById('dmn-badge').style.display = 'none';
+  document.getElementById('current-info').style.display = 'none';
+  selectedMW = 0;
+  if (!updk) return;
+  var units = activeOutages.filter(function(x){ return x.updk === updk; });
+  units.forEach(function(item) {
+    var opt = document.createElement('option');
+    opt.value = item.name;
+    opt.textContent = item.name;
+    ulSel.appendChild(opt);
+  });
+}
+
+function onUlChangeUpdate(ul) {
+  if (!ul) return;
+  var item = activeOutages.find(function(x){ return x.name === ul; });
+  if (item) {
+    selectedMW = item.mw;
+    document.getElementById('dmn-val').textContent = item.mw;
+    document.getElementById('dmn-badge').style.display = 'inline-block';
+    // Pre-fill current values
+    document.getElementById('f-rencana').value = item.rencana || 0;
+    document.getElementById('f-realisasi').value = item.realisasi || 0;
+    document.getElementById('f-rencana-num').value = item.rencana || 0;
+    document.getElementById('f-realisasi-num').value = item.realisasi || 0;
+    document.getElementById('rencana-val').textContent = (item.rencana||0) + '%';
+    document.getElementById('realisasi-val').textContent = (item.realisasi||0) + '%';
+    updateDelta();
+    // Show current info box
+    var info = document.getElementById('current-info');
+    info.style.display = 'block';
+    info.innerHTML = '<span style="color:var(--text3);font-size:11px;font-family:var(--mono)">Current → </span>' +
+      '<span style="color:var(--text2);font-size:11px;font-family:var(--mono)">Rencana: <b style="color:var(--accent2)">' + (item.rencana||0) + '%</b>' +
+      ' &nbsp; Realisasi: <b style="color:var(--green)">' + (item.realisasi||0) + '%</b></span>';
+  }
+}
+
+// ── Add New — cascading from DMN KIT ──────────────────────────────────────────
+function onUpdkChange(updk) {
+  var ulSel = document.getElementById('f-ul');
+  ulSel.innerHTML = '<option value="">— Select UP/UL —</option>';
+  document.getElementById('dmn-val').textContent = '—';
+  document.getElementById('dmn-badge').style.display = 'none';
+  document.getElementById('current-info').style.display = 'none';
+  selectedMW = 0;
+  if (!updk || !DMN_KIT[updk]) return;
+  DMN_KIT[updk].forEach(function(item) {
+    var opt = document.createElement('option');
+    opt.value = item.ul; opt.textContent = item.ul;
+    ulSel.appendChild(opt);
+  });
+}
+
+function onUlChange(ul) {
+  var updk = document.getElementById('f-updk').value;
+  if (!ul || !updk || !DMN_KIT[updk]) return;
+  var found = DMN_KIT[updk].find(function(x){ return x.ul === ul; });
+  if (found) {
+    selectedMW = found.mw;
+    document.getElementById('dmn-val').textContent = found.mw;
+    document.getElementById('dmn-badge').style.display = 'inline-block';
+  }
+}
+
+// ── Action tabs ───────────────────────────────────────────────────────────────
+function setAction(action, btn) {
+  currentAction = action;
+  document.querySelectorAll('.action-tab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  // Show/hide correct unit selector
+  document.getElementById('unit-update').style.display = (action === 'update' || action === 'complete') ? '' : 'none';
+  document.getElementById('unit-add').style.display    = (action === 'add') ? '' : 'none';
+  document.getElementById('card-progress').style.display = (action === 'complete') ? 'none' : '';
+  document.getElementById('card-add').style.display = (action === 'add') ? '' : 'none';
+  // Reset DMN display
+  document.getElementById('dmn-val').textContent = '—';
+  document.getElementById('dmn-badge').style.display = 'none';
+  document.getElementById('current-info').style.display = 'none';
+  var labels = { update: '  Submit Update', add: '  Add New Outage', complete: '  Mark as Completed' };
+  document.getElementById('submit-btn').innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' + labels[action];
+}
+
+// ── Section chips ─────────────────────────────────────────────────────────────
+function setSection(val, btn) {
+  currentSection = val;
+  document.querySelectorAll('.section-chip').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('f-section').value = val;
+}
+
+// ── Sliders ───────────────────────────────────────────────────────────────────
+function updateSlider(which) {
+  var val = parseFloat(document.getElementById('f-' + which).value);
+  document.getElementById(which + '-val').textContent = val.toFixed(2) + '%';
+  document.getElementById('f-' + which + '-num').value = val.toFixed(2);
+  if (which === 'realisasi') updateDelta();
+}
+function syncSlider(which) {
+  var num = parseFloat(document.getElementById('f-' + which + '-num').value);
+  if (isNaN(num)) return;
+  num = Math.min(100, Math.max(0, num));
+  document.getElementById('f-' + which).value = num;
+  document.getElementById(which + '-val').textContent = num.toFixed(2) + '%';
+  if (which === 'realisasi') updateDelta();
+}
+function updateDelta() {
+  var r = parseFloat(document.getElementById('f-rencana').value) || 0;
+  var a = parseFloat(document.getElementById('f-realisasi').value) || 0;
+  var delta = (a - r).toFixed(2);
+  var pill = document.getElementById('delta-pill');
+  var row  = document.getElementById('delta-row');
+  row.style.display = 'flex';
+  pill.textContent = (delta > 0 ? '+' : '') + delta + '%';
+  pill.className = 'delta-pill ' + (delta > 0 ? 'positive' : delta < 0 ? 'negative' : 'zero');
+}
+
+// ── Status ────────────────────────────────────────────────────────────────────
+function showStatus(type, msg) {
+  var card = document.getElementById('status-card');
+  var icons = { loading:'⏳', success:'✅', error:'❌' };
+  card.className = 'status-card ' + type;
+  document.getElementById('status-icon').textContent = icons[type] || '•';
+  document.getElementById('status-msg').textContent = msg;
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function hideStatus() {
+  document.getElementById('status-card').className = 'status-card';
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+async function submitForm() {
+  // Get unit name based on current action
+  var ul, updk;
+  if (currentAction === 'update' || currentAction === 'complete') {
+    updk = document.getElementById('f-updk-update').value.trim();
+    ul   = document.getElementById('f-ul-update').value.trim();
+  } else {
+    updk = document.getElementById('f-updk').value.trim();
+    ul   = document.getElementById('f-ul').value.trim();
+  }
+  if (!updk || !ul) { showStatus('error', 'Pilih UP/UPDK dan UP/UL terlebih dahulu'); return; }
+
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  showStatus('loading', 'Menyimpan data...');
+
+  try {
+    // Use cached binData if available, else fetch
+    var data = binData ? JSON.parse(JSON.stringify(binData)) : null;
+    if (!data) {
+      var res = await fetch(BIN_URL + '/latest', {
+        headers: { 'X-Master-Key': API_KEY, 'X-Bin-Meta': 'false' }
+      });
+      if (!res.ok) throw new Error('Gagal mengambil data (HTTP ' + res.status + ')');
+      data = await res.json();
+    }
+
+    var rencana   = parseFloat(document.getElementById('f-rencana').value) || 0;
+    var realisasi = parseFloat(document.getElementById('f-realisasi').value) || 0;
+    var note      = document.getElementById('f-note').value.trim();
+
+    if (currentAction === 'update') {
+      data = updateOutage(data, ul, rencana, realisasi, note);
+    } else if (currentAction === 'add') {
+      var scope = document.getElementById('f-scope').value.trim();
+      var start = document.getElementById('f-start').value.trim();
+      var end   = document.getElementById('f-end').value.trim();
+      var dur   = parseInt(document.getElementById('f-dur').value) || 0;
+      data = addOutage(data, updk, ul, selectedMW, scope, start, end, dur, rencana, realisasi, note, currentSection);
+    } else if (currentAction === 'complete') {
+      data = moveToCompleted(data, ul, note);
+    }
+
+    // Update lastUpdated = yesterday
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var dd = String(yesterday.getDate()).padStart(2,'0');
+    var mm = String(yesterday.getMonth()+1).padStart(2,'0');
+    var yy = yesterday.getFullYear();
+    data.lastUpdated = dd + '-' + mm + '-' + yy;
+
+    // Save snapshot
+    var dateKey = yy + '-' + mm + '-' + dd;
+    if (!data._snapshots) data._snapshots = {};
+    var snap = JSON.parse(JSON.stringify(data));
+    delete snap._snapshots;
+    snap._snapshotDate = dateKey;
+    data._snapshots[dateKey] = snap;
+
+    // Push to bin
+    var putRes = await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+      body: JSON.stringify(data)
+    });
+    if (!putRes.ok) throw new Error('Gagal menyimpan (HTTP ' + putRes.status + ')');
+
+    // Update cache
+    binData = data;
+    activeOutages = data.active || [];
+    populateUpdateDropdowns();
+
+    showStatus('success', 'Berhasil! Dashboard sudah diupdate untuk semua perangkat.');
+    resetForm();
+  } catch(err) {
+    showStatus('error', 'Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Data operations ───────────────────────────────────────────────────────────
+function norm(s) { return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+
+function updateOutage(data, ul, rencana, realisasi, note) {
+  var found = false;
+  ['active','done','upcoming'].forEach(function(sec) {
+    if (!data[sec]) return;
+    data[sec].forEach(function(item) {
+      if (norm(item.name) === norm(ul)) {
+        item.rencana   = rencana;
+        item.realisasi = realisasi;
+        if (note) item.note = note;
+        found = true;
+      }
+    });
+  });
+  if (!found) throw new Error('Unit tidak ditemukan di dashboard.');
+  return data;
+}
+
+function addOutage(data, updk, ul, mw, scope, start, end, dur, rencana, realisasi, note, section) {
+  if (!data[section]) data[section] = [];
+  var maxId = 0;
+  ['active','done','upcoming'].forEach(function(sec) {
+    if (data[sec]) data[sec].forEach(function(x){ if (x.id > maxId) maxId = x.id; });
+  });
+  var item = { id: maxId+1, updk: updk, name: ul, mw: mw||0, scope: scope||'',
+    start: start||'', end: end||'', dur: dur||0,
+    rencana: rencana||0, realisasi: realisasi||0, note: note||'' };
+  if (section === 'upcoming') { item.plannedStart = start; item.plannedEnd = end; }
+  data[section].push(item);
+  return data;
+}
+
+function moveToCompleted(data, ul, note) {
+  var found = null;
+  data.active = (data.active||[]).filter(function(x) {
+    if (norm(x.name) === norm(ul)) { found = x; return false; }
+    return true;
+  });
+  if (!found) throw new Error('Unit tidak ditemukan di active outages.');
+  found.realisasi = 100; found.status = 'DONE';
+  if (note) found.note = note;
+  if (!data.done) data.done = [];
+  data.done.push(found);
+  return data;
+}
+
+function resetForm() {
+  document.getElementById('f-rencana').value = 0;
+  document.getElementById('f-realisasi').value = 0;
+  document.getElementById('f-rencana-num').value = '';
+  document.getElementById('f-realisasi-num').value = '';
+  document.getElementById('rencana-val').textContent = '0%';
+  document.getElementById('realisasi-val').textContent = '0%';
+  document.getElementById('delta-row').style.display = 'none';
+  document.getElementById('f-note').value = '';
+  document.getElementById('current-info').style.display = 'none';
+  selectedMW = 0;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadActiveOutages();
+</script>
+</body>
+</html>
