@@ -382,40 +382,50 @@ function mergeLive2026(bin) {
   var activeItems = bin.active || [];
   var doneItems   = bin.done   || [];
 
-  // Mark active items as ON GOING with live progress
-  activeItems.forEach(function(item) {
-    if (!item.name) return;
-    var existing = REKAP_DATA['2026'].find(function(r) {
-      return nameMatch(r.ul, item.name);
-    });
-    if (existing) {
-      existing.liveRealisasi = item.realisasi || 0;
-      existing.liveRencana   = item.rencana   || 0;
-      existing.isLive        = true;
-      existing.isOngoing     = true;
-      existing.result        = 'ON GOING';
-      existing.durReal       = null; // still in progress
-    }
-  });
+  // First pass: collect all names that are truly active (not done)
+  var activeNames = activeItems.map(function(x){ return (x.name||'').toLowerCase(); });
 
-  // Mark done items with live data
+  // Mark DONE items first — correctly set their completed status
   doneItems.forEach(function(item) {
     if (!item.name) return;
     var existing = REKAP_DATA['2026'].find(function(r) {
       return nameMatch(r.ul, item.name);
     });
-    if (existing && !existing.isOngoing) {
-      existing.liveRealisasi = item.realisasi || 100;
-      existing.liveRencana   = item.rencana   || 100;
-      existing.isLive        = true;
-      existing.isOngoing     = false;
-      if (item.realisasi >= 100) {
-        existing.durReal     = existing.manualActualDur || existing.durReal || existing.durRenc;
-        existing.result      = item.doneStatus || 'DONE';
-        existing.selesaiReal = item.end   || '';
-        existing.mulaiReal   = item.start || '';
-      }
+    if (!existing) return;
+    existing.isLive      = true;
+    existing.isOngoing   = false;
+    existing.liveRealisasi = item.realisasi || 100;
+    existing.liveRencana   = item.rencana   || 100;
+    // Compute actual done status from actual vs planned duration
+    var actualDur = item.manualActualDur || existing.durReal || existing.durRenc;
+    var planDur   = existing.durRenc || 0;
+    if (actualDur && planDur) {
+      if (actualDur < planDur)       existing.result = 'OPTIMASI';
+      else if (actualDur === planDur) existing.result = 'ON TIME';
+      else                            existing.result = 'EXTEND';
+    } else {
+      existing.result = item.doneStatus || 'ON TIME';
     }
+    existing.durReal     = actualDur || existing.durReal;
+    existing.selesaiReal = item.end   || existing.selesaiReal || '';
+    existing.mulaiReal   = item.start || existing.mulaiReal   || '';
+  });
+
+  // Mark ACTIVE items as ON GOING (only if not already marked as done)
+  activeItems.forEach(function(item) {
+    if (!item.name) return;
+    var existing = REKAP_DATA['2026'].find(function(r) {
+      return nameMatch(r.ul, item.name);
+    });
+    if (!existing) return;
+    // Don't override if already properly marked as done
+    if (existing.isLive && !existing.isOngoing) return;
+    existing.liveRealisasi = item.realisasi || 0;
+    existing.liveRencana   = item.rencana   || 0;
+    existing.isLive        = true;
+    existing.isOngoing     = true;
+    existing.result        = 'ON GOING';
+    existing.durReal       = null;
   });
 }
 
