@@ -298,6 +298,22 @@ async function fetchLiveData() {
 
 function normName(s) { return (s||'').toLowerCase().replace(/\s+/g,' ').trim(); }
 
+// Fuzzy match: extract plant type keyword + unit number for comparison
+// "PLTM Mendalan 4" vs "PLTM MENDALAN #04" → both → "mendalan 4"
+function fuzzyName(s) {
+  return (s||'').toLowerCase()
+    .replace(/#/g, '')           // remove #
+    .replace(/ex.*/g, '')   // remove "EX PLTD ..." suffix
+    .replace(/\(.*?\)/g, '')    // remove parentheses
+    .replace(/[^a-z0-9\s]/g,'') // remove special chars
+    .replace(/0+(\d)/g, '$1') // remove leading zeros: 04 → 4, 01 → 1
+    .replace(/\s+/g, ' ').trim();
+}
+
+function nameMatch(rekapName, dashName) {
+  return fuzzyName(rekapName) === fuzzyName(dashName);
+}
+
 function mergeLive2026(bin) {
   var activeItems = bin.active || [];
   var doneItems   = bin.done   || [];
@@ -306,7 +322,7 @@ function mergeLive2026(bin) {
   activeItems.forEach(function(item) {
     if (!item.name) return;
     var existing = REKAP_DATA['2026'].find(function(r) {
-      return normName(r.ul) === normName(item.name);
+      return nameMatch(r.ul, item.name);
     });
     if (existing) {
       existing.liveRealisasi = item.realisasi || 0;
@@ -322,7 +338,7 @@ function mergeLive2026(bin) {
   doneItems.forEach(function(item) {
     if (!item.name) return;
     var existing = REKAP_DATA['2026'].find(function(r) {
-      return normName(r.ul) === normName(item.name);
+      return nameMatch(r.ul, item.name);
     });
     if (existing && !existing.isOngoing) {
       existing.liveRealisasi = item.realisasi || 100;
