@@ -401,41 +401,62 @@ function mergeLive2026(bin) {
   var activeItems = bin.active || [];
   var doneItems   = bin.done   || [];
 
-  // Process DONE items first
+  // Build set of names that are in done[]
+  var doneNames = doneItems.map(function(x){ return (x.name||'').toLowerCase(); });
+
+  // Also treat active items with realisasi>=100 (and not keepActive) as done
+  activeItems.forEach(function(item) {
+    if (parseFloat(item.realisasi) >= 100 && !item.keepActive) {
+      if (doneNames.indexOf((item.name||'').toLowerCase()) === -1) {
+        doneNames.push((item.name||'').toLowerCase());
+        doneItems.push(item);
+      }
+    }
+  });
+
+  // Process DONE items — set correct completed status
   doneItems.forEach(function(item) {
     if (!item.name) return;
-    var existing = REKAP_DATA['2026'].find(function(r){ return nameMatch(r.ul, item.name); });
+    var existing = REKAP_DATA['2026'].find(function(r){
+      return nameMatch(r.ul, item.name);
+    });
     if (!existing) return;
+
     existing.isLive        = true;
     existing.isOngoing     = false;
     existing.liveRealisasi = item.realisasi !== undefined ? item.realisasi : 100;
     existing.liveRencana   = item.rencana   !== undefined ? item.rencana   : 100;
-    // Only compute result if static data doesn't have a proper one
-    if (!existing.result || existing.result === '' || existing.result === 'ON GOING') {
-      var actualDur = item.manualActualDur || existing.durReal || existing.durRenc;
-      var planDur   = existing.durRenc || 0;
-      if (actualDur && planDur) {
-        if (actualDur < planDur)        existing.result = 'OPTIMASI';
-        else if (actualDur === planDur) existing.result = 'ON TIME';
-        else                            existing.result = 'EXTEND';
-      } else {
-        existing.result = 'ON TIME';
-      }
-      existing.durReal = actualDur || existing.durReal;
+
+    // Determine result from actual vs planned duration
+    var actualDur = item.manualActualDur || existing.durReal || existing.durRenc || 0;
+    var planDur   = existing.durRenc || 0;
+    if (actualDur > 0 && planDur > 0) {
+      if (actualDur < planDur)        existing.result = 'OPTIMASI';
+      else if (actualDur === planDur) existing.result = 'ON TIME';
+      else                            existing.result = 'EXTEND';
+    } else if (existing.result && existing.result !== 'ON GOING' && existing.result !== '') {
+      // Keep static result if we can't compute
+    } else {
+      existing.result = 'ON TIME';
     }
+    if (actualDur > 0) existing.durReal = actualDur;
     existing.selesaiReal = item.end   || existing.selesaiReal || '';
     existing.mulaiReal   = item.start || existing.mulaiReal   || '';
   });
 
-  // Process ACTIVE items — only mark ON GOING if not already done
+  // Process ACTIVE items — only mark ON GOING if genuinely still active
   activeItems.forEach(function(item) {
     if (!item.name) return;
-    var existing = REKAP_DATA['2026'].find(function(r){ return nameMatch(r.ul, item.name); });
+    // Skip if this item is actually done (realisasi >= 100)
+    if (parseFloat(item.realisasi) >= 100 && !item.keepActive) return;
+
+    var existing = REKAP_DATA['2026'].find(function(r){
+      return nameMatch(r.ul, item.name);
+    });
     if (!existing) return;
-    // Skip if already properly set as completed
+    // Skip if already marked as done by the done pass
     if (existing.isLive && !existing.isOngoing) return;
-    // Skip if static data already marks it as completed (durReal set and not ongoing)
-    if (existing.durReal !== null && existing.durReal !== undefined && existing.result && existing.result !== 'ON GOING') return;
+
     existing.liveRealisasi = item.realisasi || 0;
     existing.liveRencana   = item.rencana   || 0;
     existing.isLive        = true;
