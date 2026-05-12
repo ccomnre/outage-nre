@@ -398,6 +398,10 @@ function nameMatch(rekapName, dashName) {
 }
 
 function mergeLive2026(bin) {
+  // This function ONLY updates live progress percentages (liveRealisasi, liveRencana)
+  // It does NOT change status, result, isOngoing — those come from static data
+  // Exception: items with no static result get ON GOING if realisasi < 100
+
   var allItems = (bin.active || []).concat(bin.done || []);
 
   allItems.forEach(function(item) {
@@ -410,39 +414,26 @@ function mergeLive2026(bin) {
     var realisasi = parseFloat(item.realisasi) || 0;
     var rencana   = parseFloat(item.rencana)   || 0;
 
-    // ALWAYS update live progress for display
+    // Update live progress numbers for progress bar display
     existing.liveRealisasi = realisasi;
     existing.liveRencana   = rencana;
     existing.isLive        = true;
 
-    // Only override status if static data has NO result set
-    var hasStaticResult = existing.result && existing.result !== '' && existing.result !== 'ON GOING';
-    if (hasStaticResult) {
-      // Keep static result — just update progress numbers, don't touch status
-      existing.isOngoing = false;
-      return;
-    }
-
-    // No static result — derive from live data
-    if (realisasi >= 100 && !item.keepActive) {
-      existing.isOngoing = false;
-      var actualDur = item.manualActualDur || existing.durReal || existing.durRenc || 0;
-      var planDur   = existing.durRenc || 0;
-      if (actualDur > 0 && planDur > 0) {
-        if (actualDur < planDur)        existing.result = 'OPTIMASI';
-        else if (actualDur === planDur) existing.result = 'ON TIME';
-        else                            existing.result = 'EXTEND';
-      } else {
-        existing.result = 'ON TIME';
+    // Only set status if static data has NO result (empty string)
+    var staticResult = (existing.result || '').trim();
+    if (staticResult === '' || staticResult === 'ON GOING') {
+      if (realisasi >= 100 && !item.keepActive) {
+        existing.isOngoing = false;
+        var ad = existing.durReal || existing.durRenc || 0;
+        var pd = existing.durRenc || 0;
+        existing.result = (ad < pd) ? 'OPTIMASI' : (ad === pd) ? 'ON TIME' : 'EXTEND';
+        if (item.end && !existing.selesaiReal) existing.selesaiReal = item.end;
+      } else if (existing.isOngoing) {
+        // Already marked ON GOING in static — keep it
+        existing.result = 'ON GOING';
       }
-      if (!existing.selesaiReal && item.end)   existing.selesaiReal = item.end;
-      if (!existing.mulaiReal   && item.start) existing.mulaiReal   = item.start;
-    } else {
-      // Genuinely still active
-      existing.isOngoing = true;
-      existing.result    = 'ON GOING';
-      existing.durReal   = null;
     }
+    // For everything else: static result is preserved, only liveRealisasi/liveRencana updated
   });
 }
 
@@ -489,7 +480,7 @@ function setYear(yr, btn) {
 // ── Badge helper ──────────────────────────────────────────────────────────────
 function resultBadge(result, isLive, durReal, durRenc, isOngoing) {
   var r = (result||'').toUpperCase();
-  if (isLive || isOngoing || r === 'ON GOING' || r === 'ONGOING') return '<span class="badge b-live">● On Going</span>';
+  if (isOngoing || r === 'ON GOING' || r === 'ONGOING') return '<span class="badge b-live">● On Going</span>';
   if (!result && durReal === null) return '<span class="badge b-scheduled">Terjadwal</span>';
   if (r.includes('OPTIMASI') || r.includes('OPTIMIZED')) return '<span class="badge b-optimasi">Optimasi</span>';
   if (r.includes('ON TIME') || r.includes('ONTIME')) return '<span class="badge b-ontime">On Time</span>';
@@ -560,7 +551,7 @@ function renderTable() {
       var sign = durDiff > 0 ? '+' : '';
       diffHtml = '<div class="dur-diff ' + cls + '">' + sign + durDiff + 'd</div>';
     }
-    var liveLabel = r.isLive ? '<span class="source-badge">Live</span>' : '';
+    var liveLabel = (r.isLive && r.isOngoing) ? '<span class="source-badge">Live</span>' : '';
     var liveProgress = r.isLive && r.liveRealisasi !== undefined ? '<div style="font-size:10px;color:var(--accent);font-family:var(--mono);margin-top:2px">' + r.liveRealisasi + '% realisasi</div>' : '';
 
     // Progress display
@@ -622,7 +613,7 @@ function renderTable() {
       '<td class="td-date edit-cell"><input data-field="mulaiReal" value="' + (r.mulaiReal||'') + '" placeholder="dd Mon yyyy" style="width:100px;display:' + (isEditing?'block':'none') + '"><span class="date-real" style="display:' + (isEditing?'none':'inline') + '">' + (r.mulaiReal||'—') + '</span></td>' +
       '<td class="td-date edit-cell"><input data-field="selesaiReal" value="' + (r.selesaiReal||'') + '" placeholder="dd Mon yyyy" style="width:100px;display:' + (isEditing?'block':'none') + '"><span class="date-real" style="display:' + (isEditing?'none':'inline') + '">' + (r.selesaiReal||'—') + '</span></td>' +
       '<td>' + progressHtml + '</td>' +
-      '<td class="edit-cell"><select data-field="result" style="display:' + (isEditing?'block':'none') + '"><option value="ON GOING"' + (r.result==='ON GOING'?' selected':'') + '>On Going</option><option value="ON TIME"' + (r.result==='ON TIME'?' selected':'') + '>On Time</option><option value="OPTIMASI"' + ((r.result||'').includes('OPTIMASI')?' selected':'') + '>Optimasi</option><option value="EXTEND"' + ((r.result||'').includes('EXTEND')?' selected':'') + '>Extend</option><option value=""' + (!r.result?' selected':'') + '>Terjadwal</option></select><span style="display:' + (isEditing?'none':'inline') + '">' + resultBadge(r.result, r.isLive, r.durReal, r.durRenc, r.isOngoing) + '</span></td>' +
+      '<td class="edit-cell"><select data-field="result" style="display:' + (isEditing?'block':'none') + '"><option value="ON GOING"' + (r.result==='ON GOING'?' selected':'') + '>On Going</option><option value="ON TIME"' + (r.result==='ON TIME'?' selected':'') + '>On Time</option><option value="OPTIMASI"' + ((r.result||'').includes('OPTIMASI')?' selected':'') + '>Optimasi</option><option value="EXTEND"' + ((r.result||'').includes('EXTEND')?' selected':'') + '>Extend</option><option value=""' + (!r.result?' selected':'') + '>Terjadwal</option></select><span style="display:' + (isEditing?'none':'inline') + '">' + resultBadge(r.result, false, r.durReal, r.durRenc, r.isOngoing) + '</span></td>' +
       '<td style="display:none" class="action-col"><div class="row-actions"><button class="btn-save-row" data-yr="' + r.yr + '" data-ul="' + encodeURIComponent(r.ul) + '" onclick="saveRowBtn(this)">✓</button><button class="btn-del-row" data-yr="' + r.yr + '" data-ul="' + encodeURIComponent(r.ul) + '" onclick="delRowBtn(this)">✕</button></div></td>';
     tbody.appendChild(tr);
   });
